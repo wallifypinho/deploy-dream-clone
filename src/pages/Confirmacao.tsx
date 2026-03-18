@@ -29,10 +29,11 @@ const Confirmacao = () => {
   const seatList = seats.split(",");
   const total = price * seatList.length;
 
-  const code = bookingCode || useMemo(() => {
+  const generatedCode = useMemo(() => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     return "RE" + Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
   }, []);
+  const code = bookingCode || generatedCode;
 
   const [copied, setCopied] = useState(false);
 
