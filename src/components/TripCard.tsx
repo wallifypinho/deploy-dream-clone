@@ -1,3 +1,4 @@
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Trip } from "@/data/trips";
 import { Clock, ChevronRight, Flame } from "lucide-react";
 
@@ -6,6 +7,24 @@ interface TripCardProps {
 }
 
 const TripCard = ({ trip }: TripCardProps) => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const handleSelect = () => {
+    if (trip.soldOut) return;
+    const params = new URLSearchParams({
+      origem: trip.origin,
+      destino: trip.destination,
+      data: searchParams.get("data") || "",
+      departure: trip.departure,
+      arrival: trip.arrival,
+      company: trip.company,
+      seatType: trip.seatType,
+      price: String(trip.discountedPrice),
+      adultos: searchParams.get("adultos") || "1",
+    });
+    navigate(`/selecionar-assento?${params.toString()}`);
+  };
   return (
     <div className={`bg-card border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${trip.soldOut ? "opacity-60" : ""}`}>
       <div className="p-5">
@@ -64,7 +83,10 @@ const TripCard = ({ trip }: TripCardProps) => {
                 R$ {trip.discountedPrice.toFixed(2).replace(".", ",")}
               </p>
             </div>
-            <button className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity">
+            <button
+              onClick={handleSelect}
+              className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity"
+            >
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
