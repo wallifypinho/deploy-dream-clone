@@ -119,11 +119,11 @@ const Confirmacao = () => {
           </div>
           <h2 className="text-xl font-bold text-foreground">Pedido Criado!</h2>
 
-          {paymentMethod === "pix" && (
+    {paymentMethod === "pix" && (
             <PixPaymentSection
               total={total}
-              pixCode={pixCode || `00020126580014BR.GOV.BCB.PIX0136${code}520400005303986540${total.toFixed(2)}5802BR`}
-              hasQrImage={!!hasQrImage}
+              pixCode={pixCode}
+              hasQrImage={!!(qrBase64 || qrUrl)}
               qrBase64={qrBase64}
               qrUrl={qrUrl}
               copied={copied}
