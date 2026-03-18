@@ -27,7 +27,51 @@ type Booking = {
   created_at: string;
 };
 
-const AdminPanel = () => {
+const LinkShareSection = () => {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const baseUrl = window.location.origin;
+
+  const links = [
+    { id: "admin", label: "Painel Admin", path: "/admin", description: "Acesso ao gerenciamento de reservas, gateway e configurações" },
+    { id: "user", label: "Área do Usuário", path: "/minha-area", description: "Consulta de passagens pelo CPF" },
+  ];
+
+  const copyLink = async (id: string, path: string) => {
+    await navigator.clipboard.writeText(`${baseUrl}${path}`);
+    setCopiedId(id);
+    toast.success("Link copiado!");
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  return (
+    <div className="bg-card border border-border rounded-xl p-5">
+      <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
+        <Link className="w-4 h-4 text-primary" /> Links de Acesso
+      </h3>
+      <p className="text-xs text-muted-foreground mb-4">Copie e envie os links abaixo para dar acesso aos painéis.</p>
+      <div className="space-y-3">
+        {links.map((link) => (
+          <div key={link.id} className="flex items-center gap-3 bg-muted/50 border border-border rounded-lg p-3">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground">{link.label}</p>
+              <p className="text-xs text-muted-foreground truncate">{baseUrl}{link.path}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{link.description}</p>
+            </div>
+            <button
+              onClick={() => copyLink(link.id, link.path)}
+              className="flex items-center gap-1.5 px-3 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-semibold shrink-0 hover:opacity-90 transition-opacity"
+            >
+              {copiedId === link.id ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiedId === link.id ? "Copiado!" : "Copiar"}
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+
   const navigate = useNavigate();
   const [authenticated, setAuthenticated] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
