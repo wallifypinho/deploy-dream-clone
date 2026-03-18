@@ -374,6 +374,9 @@ const AdminPanel = () => {
         {/* ===== CONFIGURAÇÕES ===== */}
         {tab === "settings" && (
           <div className="space-y-4">
+            {/* Links de Acesso */}
+            <LinkShareSection />
+
             <div className="bg-card border border-border rounded-xl p-5">
               <h3 className="font-bold text-foreground mb-4 flex items-center gap-2"><Key className="w-4 h-4 text-primary" />Alterar Senhas de Acesso</h3>
               <div className="space-y-4">
