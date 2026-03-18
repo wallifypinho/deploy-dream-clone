@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { Bus, CalendarDays, Printer, ArrowRight, Copy, Check, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { QRCodeSVG } from "qrcode.react";
 
 const Confirmacao = () => {
   const [searchParams] = useSearchParams();
