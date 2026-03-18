@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import PasswordGate from "@/components/PasswordGate";
-import { ArrowLeft, Search, Eye, RefreshCw, Settings, LogOut, CheckCircle, Clock, XCircle, Key, CreditCard, Trash2, Save } from "lucide-react";
+import { ArrowLeft, Search, Eye, RefreshCw, Settings, LogOut, CheckCircle, Clock, XCircle, Key, CreditCard, Trash2, Save, Copy, Link, Check } from "lucide-react";
 import { toast } from "sonner";
 
 type Booking = {
