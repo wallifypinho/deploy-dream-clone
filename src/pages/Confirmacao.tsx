@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useRef, useState, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Bus, Printer, Copy, Check, Clock, Download } from "lucide-react";
+import { Bus, CalendarDays, Copy, Check, Clock, Download, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { QRCodeSVG } from "qrcode.react";
@@ -156,26 +156,44 @@ const Confirmacao = () => {
           )}
         </div>
 
-        {/* Thermal Ticket */}
-        <ThermalTicket
-          companyName={company || "VIAÇÃO EXEMPLO S.A."}
+        {/* Boarding Ticket (visible on page) */}
+        <BoardingTicket
+          code={code}
           origem={origem}
           destino={destino}
-          dataViagem={data}
-          horario={departure}
+          departure={departure}
           arrival={arrival}
-          poltrona={seats}
-          tipoServico={seatType}
-          nomePassageiro={nome}
-          documento={cpf}
-          localizador={code}
-          tarifa={price * seatList.length}
-          valorTotal={total}
-          formaPagamento={paymentMethod === "pix" ? "PIX" : "Cartão de Crédito"}
-          statusPagamento={paymentStatus}
-          numeroPedido={transactionId || code}
-          qrValue={code}
+          data={data}
+          company={company}
+          nome={nome}
+          cpf={cpf}
+          seats={seats}
+          seatType={seatType}
+          total={total}
         />
+
+        {/* Hidden thermal ticket for PDF export */}
+        <div style={{ position: "absolute", left: "-9999px", top: 0 }}>
+          <ThermalTicket
+            companyName={company || "VIAÇÃO EXEMPLO S.A."}
+            origem={origem}
+            destino={destino}
+            dataViagem={data}
+            horario={departure}
+            arrival={arrival}
+            poltrona={seats}
+            tipoServico={seatType}
+            nomePassageiro={nome}
+            documento={cpf}
+            localizador={code}
+            tarifa={price * seatList.length}
+            valorTotal={total}
+            formaPagamento={paymentMethod === "pix" ? "PIX" : "Cartão de Crédito"}
+            statusPagamento={paymentStatus}
+            numeroPedido={transactionId || code}
+            qrValue={code}
+          />
+        </div>
 
         {/* Actions */}
         <button
@@ -183,12 +201,6 @@ const Confirmacao = () => {
           className="w-full bg-foreground text-background font-bold py-3.5 rounded-lg text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
         >
           <Download className="w-4 h-4" /> Baixar / Imprimir Bilhete
-        </button>
-        <button
-          onClick={() => window.print()}
-          className="w-full border-2 border-border text-foreground font-bold py-3.5 rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-muted transition-colors"
-        >
-          <Printer className="w-4 h-4" /> Imprimir Página
         </button>
         <button
           onClick={() => navigate("/")}
@@ -265,6 +277,91 @@ const PixPaymentSection = ({
       Finalize seu pagamento para confirmar sua viagem e validar seu bilhete de embarque
     </p>
   </>
+);
+
+/* ── Boarding Ticket (visible on page) ── */
+const formatDate = (d: string) => {
+  if (!d) return "";
+  const [y, m, dd] = d.split("-");
+  return `${dd}/${m}/${y}`;
+};
+
+const formatCPF = (v: string) => {
+  const digits = v.replace(/\D/g, "");
+  if (digits.length !== 11) return v;
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+};
+
+const BoardingTicket = ({
+  code, origem, destino, departure, arrival, data, company,
+  nome, cpf, seats, seatType, total,
+}: {
+  code: string; origem: string; destino: string; departure: string;
+  arrival: string; data: string; company: string; nome: string;
+  cpf: string; seats: string; seatType: string; total: number;
+}) => (
+  <div className="bg-card rounded-2xl border-2 border-primary overflow-hidden">
+    <div className="bg-primary/10 px-5 py-3 flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <Bus className="w-4 h-4 text-primary" />
+        <span className="text-xs font-bold uppercase tracking-wider text-foreground">Bilhete de Embarque</span>
+      </div>
+      <span className="text-xs font-mono font-bold text-primary">{code}</span>
+    </div>
+
+    <div className="p-5">
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-center">
+          <p className="text-xs text-muted-foreground uppercase">Origem</p>
+          <p className="font-bold text-foreground">{origem}</p>
+          <p className="text-sm text-primary font-semibold">{departure}</p>
+        </div>
+        <div className="flex-1 mx-4 flex items-center">
+          <span className="w-2 h-2 rounded-full bg-primary" />
+          <div className="flex-1 border-t-2 border-dashed border-border relative">
+            <Bus className="w-4 h-4 text-muted-foreground absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card" />
+          </div>
+          <ArrowRight className="w-3 h-3 text-primary" />
+        </div>
+        <div className="text-center">
+          <p className="text-xs text-muted-foreground uppercase">Destino</p>
+          <p className="font-bold text-foreground">{destino}</p>
+          <p className="text-sm text-primary font-semibold">{arrival}</p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4 text-xs text-muted-foreground mb-4">
+        <span className="flex items-center gap-1"><CalendarDays className="w-3 h-3" /> {formatDate(data)}</span>
+        <span className="flex items-center gap-1"><Bus className="w-3 h-3" /> {company}</span>
+      </div>
+
+      <div className="border-t border-dashed border-border pt-3 mb-3">
+        <p className="text-xs text-muted-foreground uppercase mb-2">Passageiros (1)</p>
+        <div className="flex items-center justify-between bg-muted/50 rounded-lg p-3">
+          <div>
+            <p className="font-semibold text-sm text-foreground">{nome}</p>
+            <div className="flex gap-4 text-xs text-muted-foreground mt-1">
+              <span>CPF {formatCPF(cpf)}</span>
+              <span>Assento {seats}</span>
+              <span>Tipo {seatType}</span>
+            </div>
+          </div>
+          <span className="text-[10px] bg-accent text-accent-foreground px-2 py-0.5 rounded-full font-semibold">Adulto</span>
+        </div>
+      </div>
+
+      <div className="border-t border-dashed border-border pt-3 flex items-center justify-between">
+        <div>
+          <p className="text-xs text-muted-foreground uppercase">Valor Total</p>
+          <p className="text-xs text-muted-foreground">Código</p>
+        </div>
+        <div className="text-right">
+          <p className="text-lg font-bold text-primary">R$ {total.toFixed(2).replace(".", ",")}</p>
+          <p className="text-xs font-mono text-muted-foreground">{code}</p>
+        </div>
+      </div>
+    </div>
+  </div>
 );
 
 export default Confirmacao;
