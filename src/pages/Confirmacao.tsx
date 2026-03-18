@@ -236,12 +236,18 @@ const PixPaymentSection = ({
     </button>
 
     {/* PIX code preview */}
-    <div className="bg-muted rounded-lg p-3 mb-3">
-      <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wide mb-1">Código Copia e Cola</p>
-      <p className="text-xs text-foreground font-mono break-all leading-relaxed">
-        {pixCode.length > 80 ? pixCode.slice(0, 80) + "..." : pixCode}
-      </p>
-    </div>
+    {pixCode ? (
+      <div className="bg-muted rounded-lg p-3 mb-3">
+        <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wide mb-1">Código Copia e Cola</p>
+        <p className="text-xs text-foreground font-mono break-all leading-relaxed select-all">
+          {pixCode}
+        </p>
+      </div>
+    ) : (
+      <div className="bg-muted rounded-lg p-3 mb-3">
+        <p className="text-xs text-muted-foreground">Aguardando geração do código PIX...</p>
+      </div>
+    )}
 
     <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wide mb-4">
       Finalize seu pagamento para confirmar sua viagem e validar seu bilhete de embarque
