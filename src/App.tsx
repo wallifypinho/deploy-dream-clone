@@ -9,6 +9,8 @@ import SelecionarAssento from "./pages/SelecionarAssento.tsx";
 import DadosPassageiro from "./pages/DadosPassageiro.tsx";
 import Pagamento from "./pages/Pagamento.tsx";
 import Confirmacao from "./pages/Confirmacao.tsx";
+import AdminPanel from "./pages/AdminPanel.tsx";
+import UserPanel from "./pages/UserPanel.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,8 @@ const App = () => (
           <Route path="/dados-passageiro" element={<DadosPassageiro />} />
           <Route path="/pagamento" element={<Pagamento />} />
           <Route path="/confirmacao" element={<Confirmacao />} />
+          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/minha-area" element={<UserPanel />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

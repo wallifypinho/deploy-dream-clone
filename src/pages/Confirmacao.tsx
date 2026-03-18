@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Bus, CalendarDays, Printer, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Confirmacao = () => {
   const [searchParams] = useSearchParams();
@@ -26,6 +27,33 @@ const Confirmacao = () => {
   const code = useMemo(() => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     return "RE" + Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  }, []);
+
+  const savedRef = useRef(false);
+  useEffect(() => {
+    if (savedRef.current || !nome || !cpf) return;
+    savedRef.current = true;
+    supabase.from("bookings").insert({
+      code,
+      nome,
+      cpf,
+      email: searchParams.get("email") || null,
+      whatsapp: searchParams.get("whatsapp") || null,
+      origem,
+      destino,
+      data_viagem: data,
+      departure,
+      arrival,
+      company,
+      seat_type: seatType,
+      seats,
+      price_per_seat: price,
+      total,
+      payment_method: paymentMethod,
+      status: "pending",
+    }).then(({ error }) => {
+      if (error) console.error("Error saving booking:", error);
+    });
   }, []);
 
   const formatDate = (d: string) => {
