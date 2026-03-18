@@ -29,6 +29,33 @@ const Confirmacao = () => {
     return "RE" + Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
   }, []);
 
+  const savedRef = useRef(false);
+  useEffect(() => {
+    if (savedRef.current || !nome || !cpf) return;
+    savedRef.current = true;
+    supabase.from("bookings").insert({
+      code,
+      nome,
+      cpf,
+      email: searchParams.get("email") || null,
+      whatsapp: searchParams.get("whatsapp") || null,
+      origem,
+      destino,
+      data_viagem: data,
+      departure,
+      arrival,
+      company,
+      seat_type: seatType,
+      seats,
+      price_per_seat: price,
+      total,
+      payment_method: paymentMethod,
+      status: "pending",
+    }).then(({ error }) => {
+      if (error) console.error("Error saving booking:", error);
+    });
+  }, []);
+
   const formatDate = (d: string) => {
     if (!d) return "";
     const [y, m, dd] = d.split("-");
