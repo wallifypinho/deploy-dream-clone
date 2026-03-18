@@ -71,9 +71,9 @@ const LinkShareSection = () => {
   );
 };
 
-
-  const AdminPanel = () => {
+const AdminPanel = () => {
   const navigate = useNavigate();
+  const [authenticated, setAuthenticated] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
