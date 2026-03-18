@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, QrCode, CreditCard } from "lucide-react";
+import { ArrowLeft, QrCode, CreditCard, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Pagamento = () => {
   const [searchParams] = useSearchParams();
@@ -10,14 +12,66 @@ const Pagamento = () => {
   const destino = searchParams.get("destino") || "";
   const price = parseFloat(searchParams.get("price") || "0");
   const seats = searchParams.get("seats") || "";
+  const nome = searchParams.get("nome") || "";
+  const cpf = searchParams.get("cpf") || "";
+  const email = searchParams.get("email") || "";
   const total = price * (seats.split(",").length || 1);
 
   const [method, setMethod] = useState<"pix" | "card" | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleContinue = () => {
-    const params = new URLSearchParams(searchParams);
-    params.set("paymentMethod", method || "pix");
-    navigate(`/confirmacao?${params.toString()}`);
+  const handleContinue = async () => {
+    if (!method) return;
+    setLoading(true);
+
+    try {
+      // Generate booking code
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      const bookingCode = "RE" + Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+
+      // Call edge function to create payment via gateway
+      const { data, error } = await supabase.functions.invoke("create-payment", {
+        body: {
+          amount: total,
+          bookingCode,
+          customerName: nome,
+          customerCpf: cpf,
+          customerEmail: email,
+          paymentMethod: method,
+        },
+      });
+
+      if (error) {
+        console.error("Payment error:", error);
+        toast.error("Erro ao processar pagamento. Tente novamente.");
+        setLoading(false);
+        return;
+      }
+
+      if (data?.error) {
+        toast.error(data.error);
+        setLoading(false);
+        return;
+      }
+
+      // Navigate to confirmation with payment data
+      const params = new URLSearchParams(searchParams);
+      params.set("paymentMethod", method);
+      params.set("bookingCode", bookingCode);
+      if (data?.pix_code) params.set("pixCode", data.pix_code);
+      if (data?.qr_code_base64) params.set("qrBase64", data.qr_code_base64);
+      if (data?.qr_code_url) params.set("qrUrl", data.qr_code_url);
+      if (data?.transaction_id) params.set("transactionId", data.transaction_id);
+      if (data?.expires_at) params.set("expiresAt", data.expires_at);
+      if (data?.fallback) params.set("fallback", "true");
+
+      navigate(`/confirmacao?${params.toString()}`);
+    } catch (err) {
+      console.error("Error:", err);
+      toast.error("Erro ao conectar com o gateway de pagamento.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -42,6 +96,7 @@ const Pagamento = () => {
         <div className="space-y-3">
           <button
             onClick={() => setMethod("pix")}
+            disabled={loading}
             className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${
               method === "pix" ? "border-primary bg-accent/30" : "border-border bg-card hover:border-primary/50"
             }`}
@@ -55,6 +110,7 @@ const Pagamento = () => {
 
           <button
             onClick={() => setMethod("card")}
+            disabled={loading}
             className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${
               method === "card" ? "border-primary bg-accent/30" : "border-border bg-card hover:border-primary/50"
             }`}
@@ -77,10 +133,17 @@ const Pagamento = () => {
       <div className="sticky bottom-0 p-4 max-w-lg mx-auto w-full">
         <button
           onClick={handleContinue}
-          disabled={!method}
-          className="w-full bg-primary text-primary-foreground font-bold py-3.5 rounded-lg text-sm uppercase tracking-wide hover:opacity-90 transition-opacity disabled:opacity-50"
+          disabled={!method || loading}
+          className="w-full bg-primary text-primary-foreground font-bold py-3.5 rounded-lg text-sm uppercase tracking-wide hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          Continuar
+          {loading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Processando...
+            </>
+          ) : (
+            "Continuar"
+          )}
         </button>
       </div>
     </div>
