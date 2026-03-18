@@ -83,7 +83,10 @@ const TripCard = ({ trip }: TripCardProps) => {
                 R$ {trip.discountedPrice.toFixed(2).replace(".", ",")}
               </p>
             </div>
-            <button className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity">
+            <button
+              onClick={handleSelect}
+              className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:opacity-90 transition-opacity"
+            >
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
