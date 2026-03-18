@@ -14,7 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      admin_settings: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      bookings: {
+        Row: {
+          arrival: string
+          code: string
+          company: string
+          cpf: string
+          created_at: string
+          data_viagem: string
+          departure: string
+          destino: string
+          email: string | null
+          id: string
+          nome: string
+          origem: string
+          payment_method: string
+          price_per_seat: number
+          seat_type: string
+          seats: string
+          status: string
+          total: number
+          whatsapp: string | null
+        }
+        Insert: {
+          arrival: string
+          code: string
+          company: string
+          cpf: string
+          created_at?: string
+          data_viagem: string
+          departure: string
+          destino: string
+          email?: string | null
+          id?: string
+          nome: string
+          origem: string
+          payment_method?: string
+          price_per_seat: number
+          seat_type: string
+          seats: string
+          status?: string
+          total: number
+          whatsapp?: string | null
+        }
+        Update: {
+          arrival?: string
+          code?: string
+          company?: string
+          cpf?: string
+          created_at?: string
+          data_viagem?: string
+          departure?: string
+          destino?: string
+          email?: string | null
+          id?: string
+          nome?: string
+          origem?: string
+          payment_method?: string
+          price_per_seat?: number
+          seat_type?: string
+          seats?: string
+          status?: string
+          total?: number
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
