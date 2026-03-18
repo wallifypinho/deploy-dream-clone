@@ -209,10 +209,8 @@ const PixPaymentSection = ({
           className="w-48 h-48 object-contain"
         />
       ) : (
-        <div className="w-44 h-44 bg-foreground rounded grid grid-cols-8 gap-px p-1">
-          {Array.from({ length: 64 }, (_, i) => (
-            <div key={i} className={`${Math.random() > 0.4 ? "bg-foreground" : "bg-background"}`} />
-          ))}
+        <div className="w-44 h-44 flex items-center justify-center text-muted-foreground text-xs text-center p-4">
+          Aguardando QR Code do gateway...
         </div>
       )}
     </div>
