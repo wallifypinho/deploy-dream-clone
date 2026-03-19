@@ -1,14 +1,11 @@
 import { QRCodeSVG } from "qrcode.react";
 
 interface ThermalTicketProps {
-  // Company
   companyName?: string;
   companyCnpj?: string;
   companyAddress?: string;
   companyCityUf?: string;
   companyPhone?: string;
-
-  // Trip
   origem: string;
   destino: string;
   dataViagem: string;
@@ -20,14 +17,10 @@ interface ThermalTicketProps {
   linha?: string;
   plataforma?: string;
   arrival?: string;
-
-  // Passenger
   nomePassageiro: string;
   documento: string;
   tipoPassageiro?: string;
   localizador: string;
-
-  // Financial
   tarifa: number;
   taxaEmbarque?: number;
   seguro?: number;
@@ -36,23 +29,26 @@ interface ThermalTicketProps {
   valorPago?: number;
   formaPagamento: string;
   statusPagamento: string;
-
-  // Footer
   dataEmissao?: string;
   numeroPedido?: string;
-
-  // QR
   qrValue?: string;
 }
 
+const mono = "'Courier New', Courier, monospace";
+const gray6 = "#4b5563";
+const gray8 = "#1f2937";
+const gray9 = "#111827";
+const gray4 = "#9ca3af";
+const gray3 = "#d1d5db";
+
 const Line = () => (
-  <div className="border-t border-dashed border-gray-400 my-2" />
+  <div style={{ borderTop: "1px dashed #9ca3af", margin: "8px 0" }} />
 );
 
 const Row = ({ label, value, bold }: { label: string; value: string; bold?: boolean }) => (
-  <div className="flex justify-between text-[11px] leading-tight">
-    <span className="text-gray-600">{label}</span>
-    <span className={bold ? "font-bold text-gray-900" : "text-gray-800"}>{value}</span>
+  <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", lineHeight: "1.4", fontFamily: mono }}>
+    <span style={{ color: gray6 }}>{label}</span>
+    <span style={{ color: bold ? gray9 : gray8, fontWeight: bold ? 700 : 400 }}>{value}</span>
   </div>
 );
 
@@ -116,18 +112,21 @@ const ThermalTicket = ({
   return (
     <div
       id="thermal-ticket"
-      className="bg-white text-gray-900 mx-auto shadow-lg"
       style={{
         width: "340px",
-        fontFamily: "'Courier New', Courier, monospace",
+        fontFamily: mono,
         fontSize: "11px",
         padding: "20px 16px",
-        lineHeight: 1.5,
+        lineHeight: "1.5",
+        background: "#ffffff",
+        color: gray9,
+        margin: "0 auto",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
       }}
     >
       {/* Company header */}
-      <div className="text-center text-[10px] leading-tight mb-1">
-        <p className="font-bold text-[12px]">{companyName}</p>
+      <div style={{ textAlign: "center", fontSize: "10px", lineHeight: "1.4", marginBottom: "4px" }}>
+        <p style={{ fontWeight: 700, fontSize: "12px" }}>{companyName}</p>
         {companyCnpj && <p>CNPJ: {companyCnpj}</p>}
         {companyAddress && <p>{companyAddress}</p>}
         {companyCityUf && <p>{companyCityUf}</p>}
@@ -136,26 +135,15 @@ const ThermalTicket = ({
 
       <Line />
 
-      {/* Disclaimer */}
-      <div className="text-center my-2">
-        <p className="font-bold text-[13px] tracking-wide">PRÉVIA DE RESERVA</p>
-        <div
-          className="mx-auto mt-1 px-2 py-0.5 text-[9px] font-bold tracking-wider border rounded"
-          style={{
-            color: "#b91c1c",
-            borderColor: "#b91c1c",
-            background: "#fef2f2",
-            display: "inline-block",
-          }}
-        >
-          DOCUMENTO NÃO VÁLIDO PARA EMBARQUE
-        </div>
+      {/* Title */}
+      <div style={{ textAlign: "center", margin: "8px 0" }}>
+        <p style={{ fontWeight: 700, fontSize: "13px", letterSpacing: "1px" }}>PRÉVIA DE RESERVA</p>
       </div>
 
       <Line />
 
       {/* Trip details */}
-      <div className="space-y-0.5 my-1">
+      <div style={{ margin: "4px 0" }}>
         <Row label="Origem:" value={origem.toUpperCase()} bold />
         <Row label="Destino:" value={destino.toUpperCase()} bold />
         <Row label="Data:" value={formatDate(dataViagem)} />
@@ -172,8 +160,8 @@ const ThermalTicket = ({
       <Line />
 
       {/* Passenger */}
-      <div className="space-y-0.5 my-1">
-        <p className="text-[10px] font-bold text-gray-500 tracking-wider">PASSAGEIRO</p>
+      <div style={{ margin: "4px 0" }}>
+        <p style={{ fontSize: "10px", fontWeight: 700, color: gray4, letterSpacing: "1.5px", marginBottom: "2px" }}>PASSAGEIRO</p>
         <Row label="Nome:" value={nomePassageiro.toUpperCase()} bold />
         <Row label="CPF:" value={formatCpf(documento)} />
         <Row label="Tipo:" value={tipoPassageiro} />
@@ -182,16 +170,16 @@ const ThermalTicket = ({
 
       <Line />
 
-      {/* Illustrative barcode */}
-      <div className="flex justify-center my-2">
-        <div className="flex items-end gap-[1px]" aria-hidden="true">
+      {/* Barcode */}
+      <div style={{ display: "flex", justifyContent: "center", margin: "8px 0" }}>
+        <div style={{ display: "flex", alignItems: "flex-end", gap: "1px" }} aria-hidden="true">
           {Array.from({ length: 60 }, (_, i) => (
             <div
               key={i}
-              className="bg-gray-900"
               style={{
                 width: i % 3 === 0 ? "2px" : "1px",
                 height: `${20 + (i * 7) % 12}px`,
+                background: gray9,
               }}
             />
           ))}
@@ -201,20 +189,20 @@ const ThermalTicket = ({
       <Line />
 
       {/* Financial */}
-      <div className="space-y-0.5 my-1">
+      <div style={{ margin: "4px 0" }}>
         <Row label="Tarifa" value={formatCurrency(tarifa)} />
         <Row label="Taxa de Embarque" value={formatCurrency(taxaEmbarque)} />
         <Row label="Seguro" value={formatCurrency(seguro)} />
         {desconto > 0 && <Row label="Desconto R$" value={formatCurrency(desconto)} />}
-        <div className="border-t border-gray-300 my-1" />
+        <div style={{ borderTop: `1px solid ${gray3}`, margin: "4px 0" }} />
         <Row label="Valor Total R$" value={formatCurrency(valorTotal)} bold />
         <Row label="Valor a Pagar R$" value={formatCurrency(pago)} bold />
-        <div className="border-t border-gray-300 my-1" />
-        <div className="flex justify-between text-[11px]">
-          <span className="text-gray-600">FORMA DE PAGAMENTO</span>
-          <span className="text-gray-600">VALOR PAGO R$</span>
+        <div style={{ borderTop: `1px solid ${gray3}`, margin: "4px 0" }} />
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", fontFamily: mono }}>
+          <span style={{ color: gray6 }}>FORMA DE PAGAMENTO</span>
+          <span style={{ color: gray6 }}>VALOR PAGO R$</span>
         </div>
-        <div className="flex justify-between text-[11px] font-bold">
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", fontWeight: 700, fontFamily: mono }}>
           <span>{formaPagamento.toUpperCase()}</span>
           <span>{formatCurrency(pago)}</span>
         </div>
@@ -223,10 +211,15 @@ const ThermalTicket = ({
       <Line />
 
       {/* Payment status */}
-      <div className="text-center my-2">
+      <div style={{ textAlign: "center", margin: "8px 0" }}>
         <span
-          className="inline-block px-3 py-1 text-[10px] font-bold tracking-wider rounded"
           style={{
+            display: "inline-block",
+            padding: "4px 12px",
+            fontSize: "10px",
+            fontWeight: 700,
+            letterSpacing: "1px",
+            borderRadius: "4px",
             background:
               statusPagamento === "paid" || statusPagamento === "approved"
                 ? "#dcfce7"
@@ -247,49 +240,42 @@ const ThermalTicket = ({
 
       <Line />
 
-      {/* QR Code - illustrative */}
-      <div className="flex flex-col items-center my-3">
-        <p className="text-[9px] text-gray-400 mb-1 tracking-wider">CONSULTA DA RESERVA</p>
+      {/* QR Code */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", margin: "12px 0" }}>
+        <p style={{ fontSize: "9px", color: gray4, marginBottom: "4px", letterSpacing: "1.5px" }}>CONSULTA DA RESERVA</p>
         {qrValue ? (
           <QRCodeSVG value={qrValue} size={100} level="L" />
         ) : (
           <div
-            className="bg-gray-100 border border-gray-300 flex items-center justify-center"
-            style={{ width: 100, height: 100 }}
+            style={{
+              width: 100,
+              height: 100,
+              background: "#f3f4f6",
+              border: `1px solid ${gray3}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            <span className="text-[8px] text-gray-400">QR ILUSTRATIVO</span>
+            <span style={{ fontSize: "8px", color: gray4 }}>QR ILUSTRATIVO</span>
           </div>
         )}
-        <p className="text-[8px] text-gray-400 mt-1">Apenas para consulta interna</p>
+        <p style={{ fontSize: "8px", color: gray4, marginTop: "4px" }}>Apenas para consulta interna</p>
       </div>
 
       <Line />
 
       {/* Footer */}
-      <div className="text-center text-[9px] text-gray-500 space-y-1 mt-2">
+      <div style={{ textAlign: "center", fontSize: "9px", color: "#6b7280", marginTop: "8px" }}>
         <p>Emissão: {emissao}</p>
-        <p>Pedido: {pedido}</p>
-        <div className="border-t border-gray-300 my-1" />
-        <p className="text-[9px] leading-tight">
+        <p style={{ marginTop: "4px" }}>Pedido: {pedido}</p>
+        <div style={{ borderTop: `1px solid ${gray3}`, margin: "4px 0" }} />
+        <p style={{ fontSize: "9px", lineHeight: "1.4" }}>
           Apresente um documento oficial com foto no embarque.
         </p>
-        <p className="text-[9px] leading-tight">
+        <p style={{ fontSize: "9px", lineHeight: "1.4", marginTop: "4px" }}>
           Este é um comprovante de reserva e poderá ser atualizado após confirmação final.
         </p>
-      </div>
-
-      {/* Non-official stamp */}
-      <div className="flex justify-center mt-3">
-        <div
-          className="px-4 py-1 text-[10px] font-bold tracking-widest rounded border-2 rotate-[-3deg]"
-          style={{
-            color: "#991b1b",
-            borderColor: "#991b1b",
-            opacity: 0.6,
-          }}
-        >
-          NÃO OFICIAL
-        </div>
       </div>
     </div>
   );
