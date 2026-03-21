@@ -186,13 +186,14 @@ const AdminPanel = () => {
       return;
     }
     setGatewayLoading(true);
+    await upsertSetting("gateway_provider", gatewayProvider);
     await upsertSetting("gateway_public_key", gatewayPublicKey.trim());
     await upsertSetting("gateway_secret_key", gatewaySecretKey.trim());
-    await upsertSetting("gateway_api_url", gatewayApiUrl.trim());
+    await upsertSetting("gateway_api_url", GATEWAY_CONFIG[gatewayProvider].apiUrl);
     await upsertSetting("gateway_active", "true");
     setGatewayActive(true);
     setGatewayLoading(false);
-    toast.success("Gateway salvo e ativado!");
+    toast.success(`Gateway ${GATEWAY_CONFIG[gatewayProvider].name} salvo e ativado!`);
   };
 
   const removeGateway = async () => {
@@ -200,10 +201,11 @@ const AdminPanel = () => {
     await upsertSetting("gateway_public_key", "");
     await upsertSetting("gateway_secret_key", "");
     await upsertSetting("gateway_api_url", "");
+    await upsertSetting("gateway_provider", "");
     await upsertSetting("gateway_active", "false");
     setGatewayPublicKey("");
     setGatewaySecretKey("");
-    setGatewayApiUrl("https://api.hurapay.com.br/v1/transactions");
+    setGatewayProvider("hurapay");
     setGatewayActive(false);
     setGatewayLoading(false);
     toast.success("Chaves do gateway removidas");
