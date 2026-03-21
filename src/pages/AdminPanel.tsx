@@ -448,9 +448,11 @@ const AdminPanel = () => {
             <div className="bg-card border border-border rounded-xl p-5">
               <h4 className="font-semibold text-sm text-foreground mb-2">ℹ️ Como funciona</h4>
               <ul className="text-xs text-muted-foreground space-y-1.5 list-disc list-inside">
+                <li>Escolha entre <strong>HuraPay</strong> ou <strong>AnubisPay</strong> como gateway</li>
+                <li>A URL da API é configurada automaticamente ao selecionar o gateway</li>
                 <li>As chaves são armazenadas de forma segura no banco de dados</li>
-                <li>Ao ativar, os pagamentos via PIX e Cartão serão processados pela HuraPay</li>
-                <li>Você pode trocar as chaves ou desativar o gateway a qualquer momento</li>
+                <li>Ao ativar, os pagamentos via PIX e Cartão serão processados pelo gateway selecionado</li>
+                <li>Você pode trocar de gateway, alterar chaves ou desativar a qualquer momento</li>
                 <li>Sem gateway ativo, os pedidos serão registrados como "pendente" para confirmação manual</li>
               </ul>
             </div>
