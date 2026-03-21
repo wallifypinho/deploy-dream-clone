@@ -369,39 +369,47 @@ const AdminPanel = () => {
                 </span>
               </div>
 
-              <div className="bg-muted/50 border border-border rounded-lg p-4 mb-5">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <CreditCard className="w-4 h-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm text-foreground">HuraPay</p>
-                    <p className="text-xs text-muted-foreground">Gateway principal • PIX e Cartão de Crédito</p>
-                  </div>
+              {/* Gateway Selector */}
+              <div className="mb-5">
+                <label className="text-sm font-medium text-foreground mb-2 block">Escolha o Gateway</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {(["hurapay", "anubispay"] as const).map((provider) => (
+                    <button
+                      key={provider}
+                      onClick={() => setGatewayProvider(provider)}
+                      className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left ${
+                        gatewayProvider === provider
+                          ? "border-primary bg-accent/30"
+                          : "border-border bg-card hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                        <CreditCard className="w-4 h-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm text-foreground">{GATEWAY_CONFIG[provider].name}</p>
+                        <p className="text-xs text-muted-foreground">{GATEWAY_CONFIG[provider].description}</p>
+                      </div>
+                    </button>
+                  ))}
                 </div>
+              </div>
+
+              <div className="bg-muted/50 border border-border rounded-lg p-3 mb-5">
                 <p className="text-xs text-muted-foreground">
-                  Configure suas chaves da HuraPay para processar pagamentos. Você pode alterar ou remover as chaves a qualquer momento.
+                  <span className="font-semibold text-foreground">API:</span>{" "}
+                  <span className="font-mono">{GATEWAY_CONFIG[gatewayProvider].apiUrl}</span>
                 </p>
               </div>
 
               <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">URL da API</label>
-                  <input
-                    type="text"
-                    value={gatewayApiUrl}
-                    onChange={(e) => setGatewayApiUrl(e.target.value)}
-                    placeholder="https://api.hurapay.com.br/v1/transactions"
-                    className="w-full border border-border rounded-lg px-3 py-2.5 text-sm bg-background font-mono focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-                </div>
                 <div>
                   <label className="text-sm font-medium text-foreground mb-1.5 block">Public Key</label>
                   <input
                     type="text"
                     value={gatewayPublicKey}
                     onChange={(e) => setGatewayPublicKey(e.target.value)}
-                    placeholder="hurapay_live_..."
+                    placeholder={GATEWAY_CONFIG[gatewayProvider].pkPlaceholder}
                     className="w-full border border-border rounded-lg px-3 py-2.5 text-sm bg-background font-mono focus:outline-none focus:ring-2 focus:ring-ring"
                   />
                 </div>
@@ -411,7 +419,7 @@ const AdminPanel = () => {
                     type="password"
                     value={gatewaySecretKey}
                     onChange={(e) => setGatewaySecretKey(e.target.value)}
-                    placeholder="sk_live_..."
+                    placeholder={GATEWAY_CONFIG[gatewayProvider].skPlaceholder}
                     className="w-full border border-border rounded-lg px-3 py-2.5 text-sm bg-background font-mono focus:outline-none focus:ring-2 focus:ring-ring"
                   />
                 </div>
