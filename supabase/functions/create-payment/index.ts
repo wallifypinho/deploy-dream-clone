@@ -47,8 +47,6 @@ Deno.serve(async (req) => {
       );
     }
 
-    const basicAuth = toBase64(`${publicKey}:${secretKey}`);
-
     const gatewayPayload: Record<string, any> = {
       paymentMethod: paymentMethod === "pix" ? "pix" : "credit_card",
       amount: Math.round(amount * 100),
@@ -70,21 +68,39 @@ Deno.serve(async (req) => {
       },
     };
 
-    console.log("Calling gateway:", gatewayUrl, JSON.stringify(gatewayPayload));
+    console.log("Calling gateway:", gatewayUrl, JSON.stringify({
+      paymentMethod: gatewayPayload.paymentMethod,
+      amount: gatewayPayload.amount,
+      bookingCode,
+    }));
 
-    const gatewayResponse = await fetch(gatewayUrl, {
-      method: "POST",
-      headers: {
-        "accept": "application/json",
-        "content-type": "application/json",
-        "authorization": `Basic ${basicAuth}`,
-      },
-      body: JSON.stringify(gatewayPayload),
-    });
+    const authVariants = [
+      { label: "public_secret", value: toBase64(`${publicKey}:${secretKey}`) },
+      { label: "secret_public", value: toBase64(`${secretKey}:${publicKey}`) },
+    ];
 
-    const responseText = await gatewayResponse.text();
-    console.log("Gateway response status:", gatewayResponse.status);
-    console.log("Gateway response body:", responseText);
+    let gatewayResponse: Response | null = null;
+    let responseText = "";
+
+    for (const authVariant of authVariants) {
+      gatewayResponse = await fetch(gatewayUrl, {
+        method: "POST",
+        headers: {
+          "accept": "application/json",
+          "content-type": "application/json",
+          "authorization": `Basic ${authVariant.value}`,
+        },
+        body: JSON.stringify(gatewayPayload),
+      });
+
+      responseText = await gatewayResponse.text();
+      console.log("Gateway response status:", gatewayResponse.status, "auth_variant:", authVariant.label);
+      console.log("Gateway response body:", responseText);
+
+      if (gatewayResponse.ok || gatewayResponse.status !== 401) {
+        break;
+      }
+    }
 
     let gatewayData: any;
     try {
@@ -97,12 +113,14 @@ Deno.serve(async (req) => {
       );
     }
 
-    if (!gatewayResponse.ok) {
-      console.error("Gateway error:", gatewayResponse.status, gatewayData);
+    if (!gatewayResponse?.ok) {
+      console.error("Gateway error:", gatewayResponse?.status, gatewayData);
       return new Response(
         JSON.stringify({ 
-          error: "Erro no gateway de pagamento", 
-          status: gatewayResponse.status,
+          error: gatewayResponse?.status === 401
+            ? "Falha de autenticação no gateway. Verifique as chaves cadastradas no painel admin."
+            : "Erro no gateway de pagamento",
+          status: gatewayResponse?.status,
           details: gatewayData 
         }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } }
